@@ -24,8 +24,40 @@ app.use(function(req, res, next) {
 
 var root = __dirname;
 
-app.use("/website", express.static("website")); // If user goes to domain.com/website, we serve them the website folder
+app.use("/website", express.static("website"));
+app.use("/js", express.static("website/js"));
+app.use("/css", express.static("website/css"));
+app.use("/img", express.static("website/img"));
+app.use("/foundation-icons", express.static("website/foundation-icons"));
+app.use("/Hover-master", express.static("website/Hover-master"));
 
+app.get('/', function(req, res) {
+  fs.readFile('website/index.html', 'utf8', function(err, data) {
+    if (!err) res.send(data);
+    else return console.log(err);
+  });
+});
+
+app.get('/checkout.html', function(req, res) {
+  fs.readFile('website/checkout.html', 'utf8', function(err, data) {
+    if (!err) res.send(data);
+    else return console.log(err);
+  });
+});
+
+app.get('/product.html', function(req, res) {
+  fs.readFile('website/product.html', 'utf8', function(err, data) {
+    if (!err) res.send(data);
+    else return console.log(err);
+  });
+});
+
+app.get('/trans.html', function(req, res) {
+  fs.readFile('trans.html', 'utf8', function(err, data) {
+    if (!err) res.send(data);
+    else return console.log(err);
+  });
+});
 var nymiAuthed = false;
 app.post("/authenticateNymi", function(req, res) {
   console.log("--- NYMI AUTHENTICATED ---");
@@ -49,23 +81,24 @@ app.get("/checkNymi", function(req, res) {
 var transactionMade = false;
 var transactionData = null;
 var vantivRequest = function(data, callback) {
-  request.post({
-    url: 'https://apis.cert.vantiv.com/payment/sp2/credit/v1/sale',
-    json: data,
-    headers: {
-      'Authorization': 'VANTIV license="05175a6e48184701b51e8fdc6b085ff4$$#$$srESu0UDFlTODjCjLD5Mg918U6SbWXNt$$#$$2017-03-08$$#$$cert_key$$#$$SHA512withRSA$$#$$RSA$$#$$1$$#$$8FA52E8A5BA768320C02FEF4265A67C590881A8508840C00BE129A36A5A9CC8FEB69331FD940F8C3AEE527FA966C844F8573CA11325C294ECC3BEAAD3FB3390E49953A29478F31619E92CC63F64E42852802C504B06F482806FC3D2497447B90E435F21B96C4BBA90948D521BC2B058E0EF14258AD2EB3FA5F7192C57AE56611CBB1C621E28062DADCC2D1EBD76C633D04EF6B866DF0B8AD411ED2DB1599529CD333AFB3EF24011773E891BA399319C95FE02ED235367F4178422D60E49BADCBF5DEB4D67BB0E1189C044F18A7E4E2783698E434E1AFB264686AC350338B4CC6E9C8521B314F2A8E863C6AAD5FAE4954808D3B5783A0A26295D23B3BECA3C13E"'
-    }
-  }, function(err, httpResponse, body) {
-    if (!err) {
-      callback(body);
-      transactionMade = true;
-      transactionData = body;
-      transactionData.amount = amount;
-      console.log("Transaction Made");
-    } else {
-      console.error("Error in retrieving information from Vantiv");
-    }
-  });
+  // request.post({
+  //   url: 'https://apis.cert.vantiv.com/payment/sp2/credit/v1/sale',
+  //   json: data,
+  //   headers: {
+  //     'Authorization': 'VANTIV license="05175a6e48184701b51e8fdc6b085ff4$$#$$srESu0UDFlTODjCjLD5Mg918U6SbWXNt$$#$$2017-03-08$$#$$cert_key$$#$$SHA512withRSA$$#$$RSA$$#$$1$$#$$8FA52E8A5BA768320C02FEF4265A67C590881A8508840C00BE129A36A5A9CC8FEB69331FD940F8C3AEE527FA966C844F8573CA11325C294ECC3BEAAD3FB3390E49953A29478F31619E92CC63F64E42852802C504B06F482806FC3D2497447B90E435F21B96C4BBA90948D521BC2B058E0EF14258AD2EB3FA5F7192C57AE56611CBB1C621E28062DADCC2D1EBD76C633D04EF6B866DF0B8AD411ED2DB1599529CD333AFB3EF24011773E891BA399319C95FE02ED235367F4178422D60E49BADCBF5DEB4D67BB0E1189C044F18A7E4E2783698E434E1AFB264686AC350338B4CC6E9C8521B314F2A8E863C6AAD5FAE4954808D3B5783A0A26295D23B3BECA3C13E"'
+  //   }
+  // }, function(err, httpResponse, body) {
+  //   if (!err) {
+  //     callback(body);
+  //     transactionMade = true;
+  //     transactionData = body;
+  //     transactionData.amount = amount;
+  //     console.log("Transaction Made");
+  //   } else {
+  //     console.error("Error in retrieving information from Vantiv");
+  //   }
+  // });
+  console.log("Paid!");
 };
 var amount = 0;
 app.post('/pay', function(req, res) {
@@ -166,6 +199,12 @@ return format:
 */
 // });
 
-app.listen(process.env.PORT, function() {
-  console.log('App listening at http://%s:%s', process.env.IP, process.env.PORT);
+/* Listens on the Server Port */
+var server = app.listen(process.env.PORT || '8080', '0.0.0.0', function() {
+  if (process.env.PORT) {
+    console.log("https://pulse-pay-abdallahozaifa.c9users.io/");
+  }
+  else {
+    console.log('App listening at http://%s:%s', server.address().address, server.address().port);
+  }
 });
